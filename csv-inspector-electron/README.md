@@ -30,6 +30,14 @@ copia negli appunti) — cambia solo cosa succede sotto al cofano.
 
 ## Uso
 
+**Opzione A — scarica l'eseguibile già pronto (nessuna installazione):**
+[Release più recente](https://github.com/oTSTo/browser-localstorage-toolkit/releases/latest) →
+scarica il `.exe` portabile ed eseguilo. Windows SmartScreen potrebbe avvisare
+"editore sconosciuto" al primo avvio (l'exe non è firmato da un certificato
+commerciale): clicca "Ulteriori informazioni" > "Esegui comunque", non è
+dannoso.
+
+**Opzione B — da sorgente:**
 ```powershell
 cd csv-inspector-electron
 npm install
@@ -39,14 +47,15 @@ npm start
 Si apre la finestra dell'app: premi **Carica CSV** (dialogo nativo di
 Windows) oppure trascina direttamente i file da `C:\ProgramData\Test`.
 
-## Creare un eseguibile portabile (.exe), opzionale
+## Ricompilare l'eseguibile portabile (.exe)
 
 ```powershell
 npm run dist
 ```
 
 Genera un `.exe` portabile in `dist/` (via `electron-builder`), da poter
-copiare e lanciare senza installare Node/Electron su un altro PC.
+copiare e lanciare senza installare Node/Electron su un altro PC — lo stesso
+processo usato per generare l'exe allegato alle [Release](https://github.com/oTSTo/browser-localstorage-toolkit/releases).
 
 ## Note
 

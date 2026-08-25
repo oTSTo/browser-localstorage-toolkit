@@ -91,7 +91,7 @@ Reset completo (impostazioni, cache, login: tutto pulito) con `-Full`:
 ```
 (`-App` accetta `Discord`, `DiscordPTB`, `DiscordCanary` o `DiscordDevelopment`; default `Discord`.)
 
-**Ispezionare i CSV:** scarica `LocalStorage-Inspector.html` e aprilo col doppio click, poi trascina dentro i CSV generati. Se il CSV è pesante e la pagina si blocca, usa invece l'app desktop in [`csv-inspector-electron/`](csv-inspector-electron/README.md) (`npm install && npm start`): stesso strumento, ma con parsing in streaming e tabella virtualizzata che reggono anche file grandi senza bloccare nulla.
+**Ispezionare i CSV:** scarica `LocalStorage-Inspector.html` e aprilo col doppio click, poi trascina dentro i CSV generati. Se il CSV è pesante e la pagina si blocca, usa invece l'app desktop [`csv-inspector-electron/`](csv-inspector-electron/README.md) — [scarica l'eseguibile dalla Release](https://github.com/oTSTo/browser-localstorage-toolkit/releases/latest) (nessuna installazione) oppure `npm install && npm start` dal sorgente: stesso strumento, ma con parsing in streaming e tabella virtualizzata che reggono anche file grandi senza bloccare nulla.
 
 ## Eseguire su un PC secondario (senza clonare il repo)
 
