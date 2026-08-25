@@ -27,12 +27,35 @@ New-Item -ItemType Directory -Force -Path $outDir  | Out-Null
 New-Item -ItemType Directory -Force -Path $workDir | Out-Null
 
 # ---------------------------------------------------------------------
-# 1) Python + pacchetto chromium-reader
+# 1) Python (auto-installazione se manca) + pacchetto chromium-reader
 # ---------------------------------------------------------------------
-if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
-    Write-Error "Python non trovato nel PATH. Installalo (>=3.11) da python.org e riprova."
-    exit 1
+function Test-PythonOrInstall {
+    if (Get-Command python -ErrorAction SilentlyContinue) { return }
+
+    Write-Warning "Python non trovato nel PATH. Provo a installarlo in silenzioso con winget (nessuna finestra visibile)..."
+    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+        Write-Error "winget non disponibile. Installa Python (>=3.11) da https://python.org e riprova."
+        exit 1
+    }
+
+    winget install --id Python.Python.3.12 -e --source winget --silent --disable-interactivity --accept-package-agreements --accept-source-agreements
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Installazione automatica di Python fallita. Installalo manualmente da https://python.org e riprova."
+        exit 1
+    }
+
+    # winget aggiorna il PATH di sistema/utente, ma non quello della sessione corrente
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +
+                [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+    if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
+        Write-Error "Python e' stato installato ma non e' ancora visibile in questa sessione. Chiudi e riapri PowerShell, poi rilancia lo script."
+        exit 1
+    }
+    Write-Host "Python installato correttamente."
 }
+
+Test-PythonOrInstall
 
 Write-Host "Verifico/installo il pacchetto Python 'chromium-reader'..."
 python -m pip install --quiet --upgrade chromium-reader

@@ -18,20 +18,18 @@ mai i CSV esportati — solo gli script.
 ## Requisiti
 
 - Windows con PowerShell.
-- [Python](https://python.org) 3.11+ nel PATH (usato per leggere/scrivere lo storage in modo sicuro, senza toccare i file LevelDB a mano).
+- [Python](https://python.org) 3.11+ nel PATH (usato per leggere/scrivere lo storage in modo sicuro, senza toccare i file LevelDB a mano). Se manca, gli script provano a installarlo da soli con `winget --silent` (nessuna finestra a schermo) prima di procedere.
 
 ## Uso rapido (senza scaricare nulla — scarica ed esegue al volo)
 
-Sostituisci `TUOUTENTE/TUOREPO` con il tuo repository.
-
 **Esportare tutto in CSV:**
 ```powershell
-irm https://raw.githubusercontent.com/TUOUTENTE/TUOREPO/main/Export-LocalStorage.ps1 | iex
+irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Export-LocalStorage.ps1 | iex
 ```
 
 **Svuotare il local storage di un sito:**
 ```powershell
-$url  = "https://raw.githubusercontent.com/TUOUTENTE/TUOREPO/main/Clear-SiteLocalStorage.ps1"
+$url  = "https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Clear-SiteLocalStorage.ps1"
 $path = "$env:TEMP\Clear-SiteLocalStorage.ps1"
 Invoke-WebRequest $url -OutFile $path
 Unblock-File $path
@@ -46,3 +44,4 @@ Unblock-File $path
 - `Export-LocalStorage.ps1` chiede il browser chiuso solo per i profili che risultano bloccati: continua comunque con gli altri.
 - `Clear-SiteLocalStorage.ps1` richiede il browser **completamente chiuso** (apre una seconda istanza headless sullo stesso profilo).
 - Nessuno script modifica direttamente i file LevelDB: passano sempre dalle API ufficiali del browser (lettura via libreria Python `chromium-reader`, cancellazione via Chrome DevTools Protocol).
+- Entrambi gli script controllano all'avvio se Python è nel PATH: se manca, provano a installarlo automaticamente con `winget` (richiede Windows 10/11 con App Installer aggiornato). Se `winget` non è disponibile, va installato manualmente da [python.org](https://python.org).
