@@ -13,14 +13,15 @@
   - Chiudi Brave e Opera GX prima di eseguire lo script: se il browser e'
     aperto, alcuni file possono essere bloccati e la copia di quel profilo
     fallisce (lo script continua comunque con gli altri profili).
-  - I CSV finiscono in: Desktop\LocalStorageExport
+  - I CSV finiscono in: C:\ProgramData\Test\<Browser>\<Profilo>.csv
+    (una sottocartella per browser, un CSV per profilo)
   - Il Local Storage puo' contenere token di sessione o altri dati sensibili
     dei siti che hai visitato: tratta i CSV generati di conseguenza.
 #>
 
 $ErrorActionPreference = "Stop"
 
-$outDir  = Join-Path $env:USERPROFILE "Desktop\LocalStorageExport"
+$outDir  = "C:\ProgramData\Test"
 $workDir = Join-Path $env:TEMP "ls_export_$(Get-Random)"
 New-Item -ItemType Directory -Force -Path $outDir  | Out-Null
 New-Item -ItemType Directory -Force -Path $workDir | Out-Null
@@ -100,9 +101,11 @@ $targets | ForEach-Object { Write-Host "  - $($_.Browser) [$($_.Profile)] -> $($
 # 4) Copia ogni profilo ed esegue la conversione
 # ---------------------------------------------------------------------
 foreach ($t in $targets) {
-    $label     = "$($t.Browser)_$($t.Profile)"
-    $copyDest  = Join-Path $workDir $label
-    $csvOut    = Join-Path $outDir  "$label.csv"
+    $label      = "$($t.Browser)_$($t.Profile)"
+    $copyDest   = Join-Path $workDir $label
+    $browserDir = Join-Path $outDir $t.Browser
+    New-Item -ItemType Directory -Force -Path $browserDir | Out-Null
+    $csvOut     = Join-Path $browserDir "$($t.Profile).csv"
 
     Write-Host "`nCopio $label..."
     try {
