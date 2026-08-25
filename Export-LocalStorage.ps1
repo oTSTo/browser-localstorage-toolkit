@@ -29,10 +29,21 @@ New-Item -ItemType Directory -Force -Path $workDir | Out-Null
 # ---------------------------------------------------------------------
 # 1) Python (auto-installazione se manca) + pacchetto chromium-reader
 # ---------------------------------------------------------------------
-function Test-PythonOrInstall {
-    if (Get-Command python -ErrorAction SilentlyContinue) { return }
+function Test-PythonWorks {
+    # Su Windows, "python" puo' esistere nel PATH come stub "App execution alias"
+    # dello Store anche se Python NON e' installato: Get-Command lo trova, ma
+    # eseguirlo non stampa una versione reale. Verifichiamo l'output, non solo
+    # la presenza del comando.
+    try {
+        $v = & python --version 2>&1
+        return ($LASTEXITCODE -eq 0 -and $v -match 'Python \d+\.\d+')
+    } catch { return $false }
+}
 
-    Write-Warning "Python non trovato nel PATH. Provo a installarlo in silenzioso con winget (nessuna finestra visibile)..."
+function Test-PythonOrInstall {
+    if (Test-PythonWorks) { return }
+
+    Write-Warning "Python non trovato (o e' solo lo stub dello Store) nel PATH. Provo a installarlo in silenzioso con winget (nessuna finestra visibile)..."
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         Write-Error "winget non disponibile. Installa Python (>=3.11) da https://python.org e riprova."
         exit 1
@@ -48,8 +59,20 @@ function Test-PythonOrInstall {
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +
                 [System.Environment]::GetEnvironmentVariable("Path", "User")
 
-    if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
-        Write-Error "Python e' stato installato ma non e' ancora visibile in questa sessione. Chiudi e riapri PowerShell, poi rilancia lo script."
+    if (-not (Test-PythonWorks)) {
+        # Lo stub dello Store puo' avere priorita' nel PATH rispetto alla vera
+        # installazione appena fatta: cerchiamo l'eseguibile reale e lo mettiamo davanti.
+        $realPython = Get-ChildItem -Path @(
+            "$env:LocalAppData\Programs\Python\Python3*\python.exe",
+            "$env:ProgramFiles\Python3*\python.exe"
+        ) -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($realPython) {
+            $env:Path = (Split-Path $realPython.FullName) + ";" + $env:Path
+        }
+    }
+
+    if (-not (Test-PythonWorks)) {
+        Write-Error "Python e' stato installato ma 'python' non funziona ancora in questa sessione (probabile stub del Microsoft Store davanti nel PATH). Chiudi e riapri PowerShell e rilancia lo script; se persiste, disattiva l'alias in Impostazioni > App > Impostazioni app avanzate > Alias di esecuzione app > 'python.exe' su Off."
         exit 1
     }
     Write-Host "Python installato correttamente."
