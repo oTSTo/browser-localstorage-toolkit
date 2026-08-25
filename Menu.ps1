@@ -166,8 +166,6 @@ $mainItems = @(
     "Esporta Local Storage (Brave/Opera GX) in CSV",
     "Svuota Local Storage di un sito (Brave/Opera GX)",
     "Disconnetti / reset Discord",
-    "Apri l'Inspector CSV (HTML)",
-    "Apri l'Inspector CSV (Electron, CSV pesanti)",
     "Esci"
 )
 
@@ -205,28 +203,6 @@ while ($true) {
                     Invoke-ToolChild -Name "Clear-DiscordLocalStorage.ps1" -Params $params
                     Read-Pause
                 }
-            }
-        }
-        3 {
-            $dest = Join-Path $env:TEMP "LocalStorage-Inspector.html"
-            if ($PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot "LocalStorage-Inspector.html"))) {
-                $dest = Join-Path $PSScriptRoot "LocalStorage-Inspector.html"
-            } else {
-                Invoke-RestMethod "$RepoRaw/LocalStorage-Inspector.html" -OutFile $dest
-            }
-            Start-Process $dest
-        }
-        4 {
-            $electronDir = if ($PSScriptRoot) { Join-Path $PSScriptRoot "csv-inspector-electron" } else { $null }
-            if ($electronDir -and (Test-Path (Join-Path $electronDir "package.json"))) {
-                if (-not (Test-Path (Join-Path $electronDir "node_modules"))) {
-                    Write-Host "Prima installazione: eseguo 'npm install' in csv-inspector-electron (puo' volerci un minuto)..."
-                    Start-Process -FilePath "npm" -ArgumentList @("install") -WorkingDirectory $electronDir -NoNewWindow -Wait
-                }
-                Start-Process -FilePath "npm" -ArgumentList @("start") -WorkingDirectory $electronDir -NoNewWindow
-            } else {
-                Write-Warning "Cartella csv-inspector-electron non trovata qui accanto. Clona il repo intero e riprova, oppure vedi csv-inspector-electron/README.md su GitHub."
-                Read-Pause
             }
         }
     }
