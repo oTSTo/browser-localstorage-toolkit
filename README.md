@@ -25,8 +25,9 @@ mai i CSV esportati — solo gli script.
 
 ## Menu interattivo (consigliato)
 
-Invece di ricordare script e parametri, lancia il menu: chiede tutto a voce
-(browser, sito, ecc.) e sotto invoca lo strumento giusto.
+Invece di ricordare script e parametri, lancia il menu: selezione a frecce
+(stile Claude Code CLI) — ↑/↓ per muoverti, Invio per confermare, Esc per
+tornare indietro, oppure il tasto numerico diretto (1, 2, 3…) come scorciatoia.
 
 ```powershell
 irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Menu.ps1 | iex
@@ -36,6 +37,9 @@ Se lo lanci da un clone locale (`.\Menu.ps1`) usa i file già presenti nella
 cartella invece di riscaricarli da GitHub a ogni scelta. Ogni strumento gira
 in un **processo figlio separato**: se uno di essi termina con un errore, si
 chiude solo quello e torni al menu — la finestra PowerShell non si chiude.
+Se lo stdin non è una vera console interattiva (input rediretto, host senza
+supporto tasti come l'ISE), il menu passa da solo alla modalità classica
+numero + Invio.
 
 ## Uso rapido (senza scaricare nulla — scarica ed esegue al volo)
 
