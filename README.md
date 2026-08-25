@@ -1,7 +1,7 @@
 # Browser Local Storage Toolkit
 
-Tre strumenti per esportare, ispezionare e ripulire il **Local Storage** di
-Brave e Opera GX su Windows.
+Strumenti per esportare, ispezionare e ripulire il **Local Storage** di
+Brave, Opera GX e Discord su Windows.
 
 ⚠️ Il Local Storage può contenere token di sessione e altri dati sensibili
 dei siti che visiti. Se rendi questo repository **pubblico**, non caricarci
@@ -14,6 +14,7 @@ mai i CSV esportati — solo gli script.
 | `Export-LocalStorage.ps1` | Esporta il Local Storage di tutti i profili Brave/Opera GX trovati in CSV leggibili (uno per profilo). |
 | `LocalStorage-Inspector.html` | App standalone (apri col doppio click) per caricare i CSV e navigarli come nei DevTools: filtro per sito, ricerca, pretty-print JSON/JWT. Nessun dato lascia il browser. |
 | `Clear-SiteLocalStorage.ps1` | Svuota il Local Storage di un singolo sito in Brave o Opera GX via Chrome DevTools Protocol, senza aprire il browser a schermo. Non tocca cookie/login. |
+| `Clear-DiscordLocalStorage.ps1` | Disconnette Discord (stabile/PTB/Canary/Development) eliminando i suoi dati locali su disco. A scelta: solo Local Storage (ti disconnette) oppure reset completo con `-Full`. |
 
 ## Requisiti
 
@@ -47,6 +48,25 @@ Unblock-File $path
 & $path -Browser OperaGX -Site esempio.com
 ```
 (`-Browser` accetta `Brave` oppure `OperaGX`, `-Site` è il dominio del sito. Chiudi il browser prima di eseguirlo.)
+
+**Disconnettere/resettare Discord:**
+
+Discord blocca attivamente il remote debugging (misura anti-tampering contro
+i "token grabber"), quindi qui non si usa CDP come per i browser: lo script
+chiude Discord ed elimina direttamente la cartella su disco.
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Clear-DiscordLocalStorage.ps1)))
+```
+Solo Local Storage (ti disconnette, le altre impostazioni restano). Parametri opzionali:
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Clear-DiscordLocalStorage.ps1))) -App DiscordCanary
+```
+Reset completo (impostazioni, cache, login: tutto pulito) con `-Full`:
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Clear-DiscordLocalStorage.ps1))) -Full
+```
+(`-App` accetta `Discord`, `DiscordPTB`, `DiscordCanary` o `DiscordDevelopment`; default `Discord`.)
 
 **Ispezionare i CSV:** scarica `LocalStorage-Inspector.html` e aprilo col doppio click, poi trascina dentro i CSV generati.
 
@@ -86,6 +106,6 @@ irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/<COMMIT
 - Nessuno script apre finestre a schermo (Esplora file, browser, ecc.): lavorano tutti in silenzioso, il percorso dei CSV compare solo come testo in console.
 - `Export-LocalStorage.ps1` chiede il browser chiuso solo per i profili che risultano bloccati: continua comunque con gli altri.
 - `Clear-SiteLocalStorage.ps1` richiede il browser **completamente chiuso** (apre una seconda istanza headless sullo stesso profilo).
-- Nessuno script modifica direttamente i file LevelDB: passano sempre dalle API ufficiali del browser (lettura via libreria Python `chromium-reader`, cancellazione via Chrome DevTools Protocol).
-- Entrambi gli script controllano all'avvio se Python è nel PATH: se manca, provano a installarlo automaticamente con `winget` (richiede Windows 10/11 con App Installer aggiornato). Se `winget` non è disponibile, va installato manualmente da [python.org](https://python.org).
+- Per Brave e Opera GX nessuno script modifica direttamente i file LevelDB: passano sempre dalle API ufficiali del browser (lettura via libreria Python `chromium-reader`, cancellazione via Chrome DevTools Protocol). `Clear-DiscordLocalStorage.ps1` è l'eccezione: elimina i file LevelDB direttamente su disco, perché Discord blocca il remote debugging (CDP) come misura anti-tampering — non richiede Python.
+- Export-LocalStorage.ps1 e Clear-SiteLocalStorage.ps1 controllano all'avvio se Python è nel PATH: se manca, provano a installarlo automaticamente con `winget` (richiede Windows 10/11 con App Installer aggiornato). Se `winget` non è disponibile, va installato manualmente da [python.org](https://python.org).
 - **PC senza Python mai installato:** Windows mette comunque un finto `python.exe` nel PATH (l'"App execution alias" collegato al Microsoft Store), quindi se lanci `python --version` a mano ottieni "Python was not found; run without arguments to install from the Microsoft Store...". Gli script lo riconoscono e installano comunque Python davvero con `winget`; se dopo l'installazione vedi ancora errori, apri **Impostazioni > App > Impostazioni app avanzate > Alias di esecuzione app** e disattiva `python.exe`/`python3.exe`, poi riapri PowerShell e rilancia lo script.
