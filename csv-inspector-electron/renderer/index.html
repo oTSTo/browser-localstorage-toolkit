@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<title>LocalStorage CSV Inspector</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="mark">LS</span>
+    <span class="name">LocalStorage CSV Inspector</span>
+    <span class="sub">Brave · Opera GX · Discord</span>
+  </div>
+  <button class="btn-load" id="loadBtn">Carica CSV</button>
+  <button class="btn-ghost" id="resetBtn" disabled>Rimuovi tutto</button>
+  <select id="browserFilter" class="pick" style="display:none;"></select>
+  <span class="spacer"></span>
+  <span class="load-meta" id="loadMeta">nessun file · trascina qui i CSV</span>
+</header>
+
+<div class="stage">
+  <aside class="rail">
+    <div class="rail-head">
+      <div class="rail-label"><span>Origini</span><span class="n" id="originCount">0</span></div>
+      <input type="text" id="siteSearch" class="rail-search" placeholder="Cerca sito…" disabled />
+    </div>
+    <div class="rail-list" id="railList">
+      <div class="rail-empty">Carica i CSV generati dagli script PowerShell per elencare qui i siti.</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="origin-bar">
+      <span class="cur" id="curOrigin">—</span>
+      <span id="curBadge"></span>
+      <input type="text" id="findBox" class="find" placeholder="Filtra chiavi e valori…" disabled />
+      <span class="count" id="rowCount"></span>
+    </div>
+
+    <div class="grid-wrap" id="gridWrap">
+      <div class="grid-head">
+        <div class="gc-key">Key</div><div class="gc-val">Value</div><div class="gc-size">Size</div>
+      </div>
+      <div class="grid-scroll" id="gridScroll">
+        <div class="grid-spacer" id="gridSpacer">
+          <div class="grid-rows" id="gridRows"></div>
+        </div>
+      </div>
+      <div class="blank" id="blank">
+        <strong>Nessun dato caricato</strong>
+        Premi <code>Carica CSV</code> oppure trascina qui i file da <code>C:\ProgramData\Test</code>.
+      </div>
+    </div>
+
+    <section class="inspect" id="inspect">
+      <div class="inspect-head">
+        <span class="inspect-key" id="iKey"></span>
+        <span class="tag" id="iType"></span>
+        <span class="tag" id="iSize"></span>
+        <button class="btn-ghost" id="copyBtn">Copia</button>
+        <button class="btn-ghost" id="closeBtn">Chiudi</button>
+      </div>
+      <pre class="inspect-body" id="iBody"></pre>
+    </section>
+  </main>
+</div>
+
+<div class="drop" id="drop">Rilascia i CSV per caricarli</div>
+
+<script src="app.js"></script>
+</body>
+</html>

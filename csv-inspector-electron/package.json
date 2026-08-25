@@ -1,0 +1,27 @@
+{
+  "name": "localstorage-csv-inspector",
+  "version": "1.0.0",
+  "description": "Inspector desktop per i CSV di Local Storage esportati dal toolkit. Parsing in streaming e tabella virtualizzata: apre anche CSV pesanti senza bloccare la UI.",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest"
+  },
+  "build": {
+    "appId": "com.otsto.localstorage-csv-inspector",
+    "productName": "LocalStorage CSV Inspector",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*"
+    ],
+    "win": {
+      "target": "portable"
+    }
+  }
+}

@@ -15,6 +15,7 @@ mai i CSV esportati — solo gli script.
 | `LocalStorage-Inspector.html` | App standalone (apri col doppio click) per caricare i CSV e navigarli come nei DevTools: filtro per sito, ricerca, pretty-print JSON/JWT. Nessun dato lascia il browser. |
 | `Clear-SiteLocalStorage.ps1` | Svuota il Local Storage di un singolo sito in Brave o Opera GX via Chrome DevTools Protocol, senza aprire il browser a schermo. Non tocca cookie/login. |
 | `Clear-DiscordLocalStorage.ps1` | Disconnette Discord (stabile/PTB/Canary/Development) eliminando i suoi dati locali su disco. A scelta: solo Local Storage (ti disconnette) oppure reset completo con `-Full`. |
+| `csv-inspector-electron/` | App desktop (Electron) equivalente a `LocalStorage-Inspector.html` ma pensata per CSV **pesanti**: parsing in streaming + tabella virtualizzata, non blocca mai la UI. Vedi il [README dedicato](csv-inspector-electron/README.md). |
 
 ## Requisiti
 
@@ -68,7 +69,7 @@ Reset completo (impostazioni, cache, login: tutto pulito) con `-Full`:
 ```
 (`-App` accetta `Discord`, `DiscordPTB`, `DiscordCanary` o `DiscordDevelopment`; default `Discord`.)
 
-**Ispezionare i CSV:** scarica `LocalStorage-Inspector.html` e aprilo col doppio click, poi trascina dentro i CSV generati.
+**Ispezionare i CSV:** scarica `LocalStorage-Inspector.html` e aprilo col doppio click, poi trascina dentro i CSV generati. Se il CSV è pesante e la pagina si blocca, usa invece l'app desktop in [`csv-inspector-electron/`](csv-inspector-electron/README.md) (`npm install && npm start`): stesso strumento, ma con parsing in streaming e tabella virtualizzata che reggono anche file grandi senza bloccare nulla.
 
 ## Eseguire su un PC secondario (senza clonare il repo)
 
