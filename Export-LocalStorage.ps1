@@ -165,4 +165,3 @@ foreach ($t in $targets) {
 }
 
 Write-Host "`nFatto. CSV salvati in: $outDir"
-Invoke-Item $outDir

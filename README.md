@@ -60,8 +60,19 @@ installato da solo in silenzioso — vedi la nota sotto.
 I CSV generati restano su **quel** PC, in `C:\ProgramData\Test`: per
 analizzarli sul PC principale vanno copiati manualmente (USB, rete, ecc.).
 
+**Se subito dopo un push l'URL con `/master/` esegue ancora la versione
+precedente dello script:** è la cache CDN di `raw.githubusercontent.com` che
+non si è ancora aggiornata (di solito impiega pochi minuti). Nel frattempo
+punta al commit esatto invece del branch, usando lo SHA dell'ultimo commit
+(visibile su GitHub o con `git rev-parse HEAD`):
+
+```powershell
+irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/<COMMIT_SHA>/Export-LocalStorage.ps1 | iex
+```
+
 ## Note
 
+- Nessuno script apre finestre a schermo (Esplora file, browser, ecc.): lavorano tutti in silenzioso, il percorso dei CSV compare solo come testo in console.
 - `Export-LocalStorage.ps1` chiede il browser chiuso solo per i profili che risultano bloccati: continua comunque con gli altri.
 - `Clear-SiteLocalStorage.ps1` richiede il browser **completamente chiuso** (apre una seconda istanza headless sullo stesso profilo).
 - Nessuno script modifica direttamente i file LevelDB: passano sempre dalle API ufficiali del browser (lettura via libreria Python `chromium-reader`, cancellazione via Chrome DevTools Protocol).
