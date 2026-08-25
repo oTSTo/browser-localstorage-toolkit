@@ -11,6 +11,7 @@ mai i CSV esportati — solo gli script.
 
 | File | Cosa fa |
 |---|---|
+| `Menu.ps1` | Menu interattivo: raccoglie tutti gli strumenti sotto in un unico punto d'ingresso, senza dover ricordare parametri o URL. |
 | `Export-LocalStorage.ps1` | Esporta il Local Storage di tutti i profili Brave/Opera GX trovati in CSV leggibili (uno per profilo). |
 | `LocalStorage-Inspector.html` | App standalone (apri col doppio click) per caricare i CSV e navigarli come nei DevTools: filtro per sito, ricerca, pretty-print JSON/JWT. Nessun dato lascia il browser. |
 | `Clear-SiteLocalStorage.ps1` | Svuota il Local Storage di un singolo sito in Brave o Opera GX via Chrome DevTools Protocol, senza aprire il browser a schermo. Non tocca cookie/login. |
@@ -22,7 +23,24 @@ mai i CSV esportati — solo gli script.
 - Windows con PowerShell.
 - [Python](https://python.org) 3.11+ nel PATH (usato per leggere/scrivere lo storage in modo sicuro, senza toccare i file LevelDB a mano). Se manca, gli script provano a installarlo da soli con `winget --silent` (nessuna finestra a schermo) prima di procedere.
 
+## Menu interattivo (consigliato)
+
+Invece di ricordare script e parametri, lancia il menu: chiede tutto a voce
+(browser, sito, ecc.) e sotto invoca lo strumento giusto.
+
+```powershell
+irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Menu.ps1 | iex
+```
+
+Se lo lanci da un clone locale (`.\Menu.ps1`) usa i file già presenti nella
+cartella invece di riscaricarli da GitHub a ogni scelta. Ogni strumento gira
+in un **processo figlio separato**: se uno di essi termina con un errore, si
+chiude solo quello e torni al menu — la finestra PowerShell non si chiude.
+
 ## Uso rapido (senza scaricare nulla — scarica ed esegue al volo)
+
+Comandi diretti, uno per strumento (utile per script/automazioni; per l'uso
+normale il [menu interattivo](#menu-interattivo-consigliato) sopra è più comodo).
 
 **Esportare tutto in CSV:**
 ```powershell
