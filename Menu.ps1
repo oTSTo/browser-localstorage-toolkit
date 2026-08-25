@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   Menu interattivo (selezione a frecce, stile Claude Code CLI) che riunisce
   tutti gli strumenti del toolkit in un unico punto d'ingresso da PowerShell.
@@ -8,7 +8,7 @@
   se lo lanci al volo (irm .../Menu.ps1 | iex) scarica ogni strumento da
   GitHub solo quando lo scegli dal menu.
 
-  La selezione e' a frecce (↑/↓, Invio conferma, Esc torna indietro; funzionano
+  La selezione e' a frecce (Su/Giu, Invio conferma, Esc torna indietro; funzionano
   anche i tasti numerici come scorciatoia diretta). Se lo stdin non e' una vera
   console interattiva (input rediretto, host senza supporto ReadKey, ecc.) il
   menu passa da solo alla modalita' classica a numero + Invio.
@@ -147,7 +147,7 @@ function Show-InteractiveMenu {
     param(
         [Parameter(Mandatory=$true)][string[]]$Items,
         [string]$Title = "",
-        [string]$Hint = "↑/↓ naviga  ·  Invio conferma  ·  Esc torna indietro"
+        [string]$Hint = "Su/Giu naviga  -  Invio conferma  -  Esc torna indietro"
     )
     if ([Console]::IsInputRedirected) {
         return Show-FallbackMenu -Items $Items -Title $Title
