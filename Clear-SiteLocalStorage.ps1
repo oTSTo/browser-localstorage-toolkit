@@ -107,10 +107,11 @@ function Test-PythonOrInstall {
     }
 
     winget install --id Python.Python.3.12 -e --source winget --silent --disable-interactivity --accept-package-agreements --accept-source-agreements
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "Installazione automatica di Python fallita. Installalo manualmente da https://python.org e riprova."
-        exit 1
-    }
+    # Non trattiamo un $LASTEXITCODE diverso da 0 come errore fatale qui:
+    # winget restituisce un codice "non riuscito" anche nel caso normalissimo
+    # in cui il pacchetto risulti gia' installato e non ci sia un aggiornamento
+    # disponibile. Il controllo vero e proprio e' piu' sotto: verifichiamo se
+    # 'python' funziona davvero, cercando anche l'eseguibile reale sul disco.
 
     # winget aggiorna il PATH di sistema/utente, ma non quello della sessione corrente
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +
