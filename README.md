@@ -28,6 +28,17 @@ irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/
 ```
 
 **Svuotare il local storage di un sito:**
+
+`Clear-SiteLocalStorage.ps1` richiede parametri (`-Browser`, `-Site`), quindi
+il semplice `irm URL | iex` non basta da solo (scarica solo il testo, non lo
+esegue con argomenti). Due modi per lanciarlo con i parametri:
+
+One-liner, tutto in memoria, niente file salvato su disco:
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Clear-SiteLocalStorage.ps1))) -Browser Brave -Site discord.com
+```
+
+Oppure scaricalo su file e poi eseguilo:
 ```powershell
 $url  = "https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Clear-SiteLocalStorage.ps1"
 $path = "$env:TEMP\Clear-SiteLocalStorage.ps1"
@@ -35,7 +46,7 @@ Invoke-WebRequest $url -OutFile $path
 Unblock-File $path
 & $path -Browser OperaGX -Site esempio.com
 ```
-(`-Browser` accetta `Brave` oppure `OperaGX`. Chiudi il browser prima di eseguirlo.)
+(`-Browser` accetta `Brave` oppure `OperaGX`, `-Site` è il dominio del sito. Chiudi il browser prima di eseguirlo.)
 
 **Ispezionare i CSV:** scarica `LocalStorage-Inspector.html` e aprilo col doppio click, poi trascina dentro i CSV generati.
 
@@ -52,10 +63,10 @@ irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/
 ```
 
 Usando `irm | iex` lo script gira come comandi in memoria, quindi non serve
-`Unblock-File` né toccare l'Execution Policy. Per lo script con parametri,
-scaricalo prima e poi eseguilo con gli argomenti (vedi sopra "Svuotare il
-local storage di un sito"). Se sul PC secondario manca Python, viene
-installato da solo in silenzioso — vedi la nota sotto.
+`Unblock-File` né toccare l'Execution Policy. Per lo script con parametri
+(`Clear-SiteLocalStorage.ps1`) usa il one-liner con scriptblock (vedi sopra
+"Svuotare il local storage di un sito"). Se sul PC secondario manca Python,
+viene installato da solo in silenzioso — vedi la nota sotto.
 
 I CSV generati restano su **quel** PC, in `C:\ProgramData\Test`: per
 analizzarli sul PC principale vanno copiati manualmente (USB, rete, ecc.).
