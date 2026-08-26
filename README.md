@@ -13,6 +13,7 @@ mai i CSV esportati — solo gli script.
 |---|---|
 | `Menu.ps1` | Menu interattivo: raccoglie tutti gli strumenti sotto in un unico punto d'ingresso, senza dover ricordare parametri o URL. |
 | `Export-LocalStorage.ps1` | Esporta il Local Storage di tutti i profili Brave/Opera GX trovati in CSV leggibili (uno per profilo). |
+| `Find-SessionTokens.ps1` | Cerca nei CSV già esportati le chiavi che contengono "token" (case-insensitive: `token`, `authToken`, `access_token`, `COPILOT_AUTH_TOKEN`, ecc.) e mostra browser, profilo, sito e valore. |
 | `LocalStorage-Inspector.html` | App standalone (apri col doppio click) per caricare i CSV e navigarli come nei DevTools: filtro per sito, ricerca, pretty-print JSON/JWT. Nessun dato lascia il browser. |
 | `Clear-SiteLocalStorage.ps1` | Svuota il Local Storage di un singolo sito in Brave o Opera GX via Chrome DevTools Protocol, senza aprire il browser a schermo. Non tocca cookie/login. |
 | `Clear-DiscordLocalStorage.ps1` | Disconnette Discord (stabile/PTB/Canary/Development) eliminando i suoi dati locali su disco. A scelta: solo Local Storage (ti disconnette) oppure reset completo con `-Full`. |
@@ -50,6 +51,12 @@ normale il [menu interattivo](#menu-interattivo-consigliato) sopra è più comod
 ```powershell
 irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Export-LocalStorage.ps1 | iex
 ```
+
+**Cercare token di sessione nei CSV già esportati:**
+```powershell
+irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Find-SessionTokens.ps1 | iex
+```
+Cerca solo nei CSV che hai già generato con `Export-LocalStorage.ps1` — non tocca i browser. I valori vengono mostrati in chiaro: tratta l'output con cautela.
 
 **Svuotare il local storage di un sito:**
 

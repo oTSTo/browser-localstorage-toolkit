@@ -164,6 +164,7 @@ function Show-InteractiveMenu {
 # ---------------------------------------------------------------------
 $mainItems = @(
     "Esporta Local Storage (Brave/Opera GX) in CSV",
+    "Cerca token di sessione nei CSV esportati",
     "Svuota Local Storage di un sito (Brave/Opera GX)",
     "Disconnetti / reset Discord",
     "Esci"
@@ -180,6 +181,10 @@ while ($true) {
             Read-Pause
         }
         1 {
+            Invoke-ToolChild -Name "Find-SessionTokens.ps1"
+            Read-Pause
+        }
+        2 {
             $b = Show-InteractiveMenu -Items @("Brave", "Opera GX") -Title "Quale browser?"
             if ($null -ne $b) {
                 $browser = if ($b -eq 1) { "OperaGX" } else { "Brave" }
@@ -192,7 +197,7 @@ while ($true) {
                 Read-Pause
             }
         }
-        2 {
+        3 {
             $appIdx = Show-InteractiveMenu -Items @("Discord (stabile)", "Discord PTB", "Discord Canary", "Discord Development") -Title "Quale build di Discord?"
             if ($null -ne $appIdx) {
                 $app = @("Discord", "DiscordPTB", "DiscordCanary", "DiscordDevelopment")[$appIdx]
