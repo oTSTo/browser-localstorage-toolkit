@@ -11,7 +11,9 @@
      da -Pattern (case-insensitive): con il default "token" trova sia la
      chiave esatta "token" sia varianti comuni come "authToken",
      "access_token", "session_token", ecc.
-  3. Mostra a schermo browser, profilo, sito, chiave e valore trovato.
+  3. Mostra a schermo browser, profilo, sito, chiave e il valore trovato.
+     Per default il valore viene MASCHERATO (mostra solo inizio/fine e la
+     lunghezza): serve a capire dove si trova un token, non a leggerlo.
 
 .PARAMETER BaseDir
   Cartella dove si trovano i CSV esportati. Default: C:\ProgramData\Test.
@@ -20,20 +22,33 @@
   Sottostringa da cercare nel nome della chiave (case-insensitive).
   Default: "token".
 
+.PARAMETER Reveal
+  Mostra il valore per intero invece che mascherato. Da usare solo se ti
+  serve davvero leggere il token, con lo schermo non condiviso/registrato.
+
 .EXAMPLE
   .\Find-SessionTokens.ps1
   .\Find-SessionTokens.ps1 -Pattern "jwt"
+  .\Find-SessionTokens.ps1 -Reveal
 
 .NOTES
   - Richiede di aver gia' esportato i CSV con Export-LocalStorage.ps1.
-  - I valori vengono mostrati in chiaro: trattali con cautela, non
-    incollarli in posti pubblici (chat, issue, screenshot condivisi).
+  - Anche mascherato, questo strumento conferma DOVE esistono dei token:
+    tratta comunque l'output con cautela.
 #>
 
 param(
     [string]$BaseDir = "C:\ProgramData\Test",
-    [string]$Pattern = "token"
+    [string]$Pattern = "token",
+    [switch]$Reveal
 )
+
+function Get-MaskedValue {
+    param([string]$Value)
+    $len = $Value.Length
+    if ($len -le 8) { return ("*" * $len) }
+    return $Value.Substring(0, 4) + ("*" * 6) + $Value.Substring($len - 4)
+}
 
 $ErrorActionPreference = "Stop"
 $browsers = @("Brave", "OperaGX")
@@ -68,13 +83,14 @@ foreach ($browser in $browsers) {
 
         $foundAny = $true
         foreach ($row in $hits) {
+            $displayValue = if ($Reveal) { $row.valore } else { Get-MaskedValue $row.valore }
             Write-Host ""
             Write-Host "TROVATO" -ForegroundColor Green
             Write-Host "  Browser   : $browser"
             Write-Host "  Profilo   : $($csv.BaseName)"
             Write-Host "  Sito      : $($row.sito)"
             Write-Host "  Chiave    : $($row.chiave)"
-            Write-Host "  Valore    : $($row.valore)" -ForegroundColor Yellow
+            Write-Host "  Valore    : $displayValue" -ForegroundColor Yellow
             Write-Host "  Lunghezza : $($row.valore.Length) caratteri" -ForegroundColor DarkGray
             Write-Host "  ------------------------------------" -ForegroundColor DarkGray
         }
