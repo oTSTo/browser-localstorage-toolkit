@@ -13,7 +13,7 @@ mai i CSV esportati — solo gli script.
 |---|---|
 | `Menu.ps1` | Menu interattivo: raccoglie tutti gli strumenti sotto in un unico punto d'ingresso, senza dover ricordare parametri o URL. |
 | `Export-LocalStorage.ps1` | Esporta il Local Storage di tutti i profili Brave/Opera GX trovati in CSV leggibili (uno per profilo). |
-| `Find-SessionTokens.ps1` | Cerca nei CSV già esportati le chiavi che contengono "token" (case-insensitive: `token`, `authToken`, `access_token`, `COPILOT_AUTH_TOKEN`, ecc.) e mostra browser, profilo, sito e valore. |
+| `Find-SessionTokens.ps1` | Cerca nei CSV già esportati le chiavi che contengono "token" (case-insensitive), filtra i risultati per lunghezza del valore in stile token Discord (default 59-80 caratteri, scarta il rumore) e mostra browser, profilo, sito e valore per intero. |
 | `LocalStorage-Inspector.html` | App standalone (apri col doppio click) per caricare i CSV e navigarli come nei DevTools: filtro per sito, ricerca, pretty-print JSON/JWT. Nessun dato lascia il browser. |
 | `Clear-SiteLocalStorage.ps1` | Svuota il Local Storage di un singolo sito in Brave o Opera GX via Chrome DevTools Protocol, senza aprire il browser a schermo. Non tocca cookie/login. |
 | `Clear-DiscordLocalStorage.ps1` | Disconnette Discord (stabile/PTB/Canary/Development) eliminando i suoi dati locali su disco. A scelta: solo Local Storage (ti disconnette) oppure reset completo con `-Full`. |
@@ -56,7 +56,11 @@ irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/
 ```powershell
 irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Find-SessionTokens.ps1 | iex
 ```
-Cerca solo nei CSV che hai già generato con `Export-LocalStorage.ps1` — non tocca i browser. I valori vengono mostrati in chiaro: tratta l'output con cautela.
+Cerca solo nei CSV che hai già generato con `Export-LocalStorage.ps1` — non tocca i browser. Per default mostra solo i valori lunghi 59-80 caratteri (lo standard dei token Discord: 59 pre-2022, 70-80 attuale), per scartare automaticamente i falsi positivi come contatori/timestamp/blob JSON che contengono "token" nel nome ma non sono affatto un token. Per vedere tutto senza filtro di lunghezza:
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Find-SessionTokens.ps1))) -MinLength 0 -MaxLength 999999
+```
+I valori vengono mostrati in chiaro: tratta l'output con cautela.
 
 **Svuotare il local storage di un sito:**
 
