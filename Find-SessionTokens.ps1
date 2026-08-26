@@ -1,7 +1,8 @@
 <#
 .SYNOPSIS
   Cerca nei CSV esportati da Export-LocalStorage.ps1 le chiavi che sembrano
-  token di sessione, e le mostra a schermo.
+  token di sessione, filtrando per lunghezza del valore in stile token
+  Discord, e le mostra a schermo per intero.
 
 .DESCRIPTION
   1. Cerca i CSV in <BaseDir>\Brave\ e <BaseDir>\OperaGX\ (default
@@ -11,9 +12,12 @@
      da -Pattern (case-insensitive): con il default "token" trova sia la
      chiave esatta "token" sia varianti comuni come "authToken",
      "access_token", "session_token", ecc.
-  3. Mostra a schermo browser, profilo, sito, chiave e il valore trovato.
-     Per default il valore viene MASCHERATO (mostra solo inizio/fine e la
-     lunghezza): serve a capire dove si trova un token, non a leggerlo.
+  3. Tra quelle, tiene solo le righe il cui VALORE ha una lunghezza tra
+     -MinLength e -MaxLength: i token Discord sono lunghi circa 59
+     caratteri (standard pre-2022) fino a 70-80 (standard attuale), quindi
+     il default 59-80 scarta il rumore (blob JSON, timestamp, contatori,
+     ecc. che contengono "token" nella chiave ma non sono affatto un token).
+  4. Mostra a schermo browser, profilo, sito, chiave e il valore per intero.
 
 .PARAMETER BaseDir
   Cartella dove si trovano i CSV esportati. Default: C:\ProgramData\Test.
@@ -22,39 +26,36 @@
   Sottostringa da cercare nel nome della chiave (case-insensitive).
   Default: "token".
 
-.PARAMETER Reveal
-  Mostra il valore per intero invece che mascherato. Da usare solo se ti
-  serve davvero leggere il token, con lo schermo non condiviso/registrato.
+.PARAMETER MinLength
+  Lunghezza minima del valore da mostrare. Default: 59.
+
+.PARAMETER MaxLength
+  Lunghezza massima del valore da mostrare. Default: 80.
 
 .EXAMPLE
   .\Find-SessionTokens.ps1
-  .\Find-SessionTokens.ps1 -Pattern "jwt"
-  .\Find-SessionTokens.ps1 -Reveal
+  .\Find-SessionTokens.ps1 -MinLength 0 -MaxLength 999999
+  (nessun filtro di lunghezza: mostra tutte le chiavi che contengono "token",
+  utile se cerchi qualcosa che non e' un token Discord)
 
 .NOTES
   - Richiede di aver gia' esportato i CSV con Export-LocalStorage.ps1.
-  - Anche mascherato, questo strumento conferma DOVE esistono dei token:
-    tratta comunque l'output con cautela.
+  - I valori vengono mostrati in chiaro: trattali con cautela, non
+    incollarli in posti pubblici (chat, issue, screenshot condivisi).
 #>
 
 param(
     [string]$BaseDir = "C:\ProgramData\Test",
     [string]$Pattern = "token",
-    [switch]$Reveal
+    [int]$MinLength = 59,
+    [int]$MaxLength = 80
 )
-
-function Get-MaskedValue {
-    param([string]$Value)
-    $len = $Value.Length
-    if ($len -le 8) { return ("*" * $len) }
-    return $Value.Substring(0, 4) + ("*" * 6) + $Value.Substring($len - 4)
-}
 
 $ErrorActionPreference = "Stop"
 $browsers = @("Brave", "OperaGX")
 $foundAny = $false
 
-Write-Host "`nCerco chiavi che contengono '$Pattern' nei CSV esportati..." -ForegroundColor Cyan
+Write-Host "`nCerco chiavi che contengono '$Pattern' con valore lungo $MinLength-$MaxLength caratteri..." -ForegroundColor Cyan
 Write-Host ""
 
 foreach ($browser in $browsers) {
@@ -74,7 +75,11 @@ foreach ($browser in $browsers) {
         Write-Host "Analizzo: $($csv.FullName)" -ForegroundColor Gray
 
         $data = Import-Csv -Path $csv.FullName -Encoding UTF8
-        $hits = @($data | Where-Object { $_.chiave -like "*$Pattern*" })
+        $hits = @($data | Where-Object {
+            $_.chiave -like "*$Pattern*" -and
+            $_.valore.Length -ge $MinLength -and
+            $_.valore.Length -le $MaxLength
+        })
 
         if ($hits.Count -eq 0) {
             Write-Host "  Nessuna corrispondenza in questo profilo" -ForegroundColor DarkGray
@@ -83,14 +88,13 @@ foreach ($browser in $browsers) {
 
         $foundAny = $true
         foreach ($row in $hits) {
-            $displayValue = if ($Reveal) { $row.valore } else { Get-MaskedValue $row.valore }
             Write-Host ""
             Write-Host "TROVATO" -ForegroundColor Green
             Write-Host "  Browser   : $browser"
             Write-Host "  Profilo   : $($csv.BaseName)"
             Write-Host "  Sito      : $($row.sito)"
             Write-Host "  Chiave    : $($row.chiave)"
-            Write-Host "  Valore    : $displayValue" -ForegroundColor Yellow
+            Write-Host "  Valore    : $($row.valore)" -ForegroundColor Yellow
             Write-Host "  Lunghezza : $($row.valore.Length) caratteri" -ForegroundColor DarkGray
             Write-Host "  ------------------------------------" -ForegroundColor DarkGray
         }
@@ -105,6 +109,7 @@ if (-not $foundAny) {
     Write-Host "  1. Aver esportato i CSV (opzione 'Esporta Local Storage' del menu)"
     Write-Host "  2. Aver chiuso i browser prima dell'esportazione"
     Write-Host "  3. Avere davvero sessioni attive salvate nei browser"
+    Write-Host "  4. Provare ad allargare il filtro: -MinLength 0 -MaxLength 999999"
 } else {
     Write-Host "Fatto." -ForegroundColor Green
 }
