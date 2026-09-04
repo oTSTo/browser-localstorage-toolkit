@@ -1,11 +1,12 @@
 # Browser Local Storage Toolkit
 
 Strumenti per esportare, ispezionare e ripulire il **Local Storage** di
-Brave, Opera GX e Discord su Windows.
+Brave, Opera GX e Discord, e per leggere i cookie di sessione di Chrome,
+Brave e Opera GX, su Windows.
 
-⚠️ Il Local Storage può contenere token di sessione e altri dati sensibili
-dei siti che visiti. Se rendi questo repository **pubblico**, non caricarci
-mai i CSV esportati — solo gli script.
+⚠️ Il Local Storage e i cookie possono contenere token di sessione e altri
+dati sensibili dei siti che visiti. Se rendi questo repository **pubblico**,
+non caricarci mai i CSV esportati o i valori letti — solo gli script.
 
 ## File
 
@@ -16,6 +17,7 @@ mai i CSV esportati — solo gli script.
 | `Find-SessionTokens.ps1` | Cerca nei CSV già esportati le chiavi che contengono "token" (case-insensitive), filtra i risultati per lunghezza del valore in stile token Discord (default 59-80 caratteri, scarta il rumore) e mostra browser, profilo, sito e valore per intero. |
 | `LocalStorage-Inspector.html` | App standalone (apri col doppio click) per caricare i CSV e navigarli come nei DevTools: filtro per sito, ricerca, pretty-print JSON/JWT. Nessun dato lascia il browser. |
 | `Clear-SiteLocalStorage.ps1` | Svuota il Local Storage di un singolo sito in Brave o Opera GX via Chrome DevTools Protocol, senza aprire il browser a schermo. Non tocca cookie/login. |
+| `Get-BrowserCookie.ps1` | Legge un cookie specifico (anche HttpOnly) da Chrome, Brave o Opera GX via Chrome DevTools Protocol, senza aprire il browser a schermo. Non richiede Python. |
 | `Clear-DiscordLocalStorage.ps1` | Disconnette Discord (stabile/PTB/Canary/Development) eliminando i suoi dati locali su disco. A scelta: solo Local Storage (ti disconnette) oppure reset completo con `-Full`. |
 | `csv-inspector-electron/` | App desktop (Electron) equivalente a `LocalStorage-Inspector.html` ma pensata per CSV **pesanti**: parsing in streaming + tabella virtualizzata, non blocca mai la UI. Vedi il [README dedicato](csv-inspector-electron/README.md). |
 
@@ -83,6 +85,19 @@ Unblock-File $path
 ```
 (`-Browser` accetta `Brave` oppure `OperaGX`, `-Site` è il dominio del sito. Chiudi il browser prima di eseguirlo.)
 
+**Leggere un cookie di sessione:**
+
+`Get-BrowserCookie.ps1` richiede parametri (`-Domain`, `-CookieName`), quindi
+usa lo stesso one-liner con scriptblock:
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Get-BrowserCookie.ps1))) -Domain instagram.com -CookieName sessionid
+```
+Per Brave o Opera GX aggiungi `-Browser`:
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/master/Get-BrowserCookie.ps1))) -Domain discord.com -CookieName token -Browser Brave
+```
+(`-Browser` accetta `Chrome` [default], `Brave` oppure `OperaGX`. Chiude e riavvia da solo il browser: non serve chiuderlo a mano prima.)
+
 **Disconnettere/resettare Discord:**
 
 Discord blocca attivamente il remote debugging (misura anti-tampering contro
@@ -140,6 +155,7 @@ irm https://raw.githubusercontent.com/oTSTo/browser-localstorage-toolkit/<COMMIT
 - Nessuno script apre finestre a schermo (Esplora file, browser, ecc.): lavorano tutti in silenzioso, il percorso dei CSV compare solo come testo in console.
 - `Export-LocalStorage.ps1` chiede il browser chiuso solo per i profili che risultano bloccati: continua comunque con gli altri.
 - `Clear-SiteLocalStorage.ps1` richiede il browser **completamente chiuso** (apre una seconda istanza headless sullo stesso profilo).
+- `Get-BrowserCookie.ps1` non richiede Python (client WebSocket scritto a mano su `TcpClient`) e chiude/riavvia da solo il browser se lo trova già aperto.
 - Per Brave e Opera GX nessuno script modifica direttamente i file LevelDB: passano sempre dalle API ufficiali del browser (lettura via libreria Python `chromium-reader`, cancellazione via Chrome DevTools Protocol). `Clear-DiscordLocalStorage.ps1` è l'eccezione: elimina i file LevelDB direttamente su disco, perché Discord blocca il remote debugging (CDP) come misura anti-tampering — non richiede Python.
 - Export-LocalStorage.ps1 e Clear-SiteLocalStorage.ps1 controllano all'avvio se Python è nel PATH: se manca, provano a installarlo automaticamente con `winget` (richiede Windows 10/11 con App Installer aggiornato). Se `winget` non è disponibile, va installato manualmente da [python.org](https://python.org).
 - **PC senza Python mai installato:** Windows mette comunque un finto `python.exe` nel PATH (l'"App execution alias" collegato al Microsoft Store), quindi se lanci `python --version` a mano ottieni "Python was not found; run without arguments to install from the Microsoft Store...". Gli script lo riconoscono e installano comunque Python davvero con `winget`; se dopo l'installazione vedi ancora errori, apri **Impostazioni > App > Impostazioni app avanzate > Alias di esecuzione app** e disattiva `python.exe`/`python3.exe`, poi riapri PowerShell e rilancia lo script.

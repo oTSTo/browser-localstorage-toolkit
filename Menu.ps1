@@ -166,6 +166,7 @@ $mainItems = @(
     "Esporta Local Storage (Brave/Opera GX) in CSV",
     "Cerca token di sessione nei CSV esportati",
     "Svuota Local Storage di un sito (Brave/Opera GX)",
+    "Leggi un cookie di sessione (Chrome/Brave/Opera GX)",
     "Disconnetti / reset Discord",
     "Esci"
 )
@@ -198,6 +199,20 @@ while ($true) {
             }
         }
         3 {
+            $b = Show-InteractiveMenu -Items @("Chrome", "Brave", "Opera GX") -Title "Quale browser?"
+            if ($null -ne $b) {
+                $browser = @("Chrome", "Brave", "OperaGX")[$b]
+                $domain = Read-Host "Dominio del sito (es. instagram.com)"
+                $cookieName = Read-Host "Nome del cookie (es. sessionid)"
+                if ([string]::IsNullOrWhiteSpace($domain) -or [string]::IsNullOrWhiteSpace($cookieName)) {
+                    Write-Warning "Dominio o nome cookie mancante, annullato."
+                } else {
+                    Invoke-ToolChild -Name "Get-BrowserCookie.ps1" -Params @{ Browser = $browser; Domain = $domain; CookieName = $cookieName }
+                }
+                Read-Pause
+            }
+        }
+        4 {
             $appIdx = Show-InteractiveMenu -Items @("Discord (stabile)", "Discord PTB", "Discord Canary", "Discord Development") -Title "Quale build di Discord?"
             if ($null -ne $appIdx) {
                 $app = @("Discord", "DiscordPTB", "DiscordCanary", "DiscordDevelopment")[$appIdx]
